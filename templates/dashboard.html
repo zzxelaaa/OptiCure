@@ -1,0 +1,117 @@
+<!-- templates/dashboard.html (do not remove/change this comment) -->
+{% extends "base.html" %} {% block title %}Dashboard{% endblock %} {% block topbar_text %}Dashboard{% endblock %} {% block content %}
+<div class="container-fluid mt-4">
+	<div class="row">
+		<div class="col">
+			<button type="button" class="btn btn-outline-light w-100" style="font-size: 1.5rem" data-bs-toggle="modal" data-bs-target="#parametersModal">
+				<i class="bi bi-speedometer"></i> Parameters
+			</button>
+		</div>
+		<div class="col">
+			<button type="button" class="btn btn-outline-light w-100" style="font-size: 1.5rem" data-bs-toggle="modal" data-bs-target="#historyModal">
+				<i class="bi bi-clock-history"></i> History
+			</button>
+		</div>
+		<div class="col">
+			<button type="button" class="btn btn-outline-light w-100" style="font-size: 1.5rem" id="exitButton">
+				<i class="bi bi-box-arrow-left"></i> Exit
+			</button>
+		</div>
+		<div class="col">
+			<button type="button" class="btn btn-outline-light w-100" style="font-size: 1.5rem" data-bs-toggle="modal" data-bs-target="#aboutModal">
+				<i class="bi bi-info-circle"></i> About
+			</button>
+		</div>
+	</div>
+	<div class="row mt-4" style="height: calc(100vh - 16rem)">
+		<div class="col-6">
+			<div class="card h-100" style="background-color: white; border: 0.125rem solid black">
+				<div class="card-body">
+					<h3 class="card-title text-center">Sensor Readings</h3>
+					<div id="sensorGraph"></div>
+				</div>
+			</div>
+		</div>
+		<div class="col-6">
+			<div class="card h-100" style="background-color: white; border: 0.125rem solid black">
+				<div class="card-body">
+					<h3 class="card-title text-center">Latest Recorded History</h3>
+					<div id="latestHistoryGraph"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% include "modal_parameters.html" %} {% include "modal_history.html" %}
+
+<!-- About Modal -->
+<div class="modal fade" id="aboutModal" tabindex="-1" aria-labelledby="aboutModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="aboutModalLabel">About</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div class="container">
+					<div class="row">
+						<div class="col-12">
+							<p style="text-align: justify">
+								The manual curing process used in the current compost curing method is laborious, extensive, and inaccurate in detecting
+								parameters. This design project focuses on the influence of administration of precise setting of parameters in setting a viable
+								environment for compost curing. The study proposes fast compost curing in a controlled environment. A control system equipped
+								with sensors, mechanical components, and an optimization algorithm for swift production of cured compost will be developed in
+								this project. The system utilizes an optimization algorithm to control and optimize the parameters for a favorable compost
+								environment. Additionally, utilizing sensors for data gathering of compost temperature, nitrogen, phosphorus, potassium, pH
+								level, and moisture content for optimal curing parameter setting.
+							</p>
+							<p style="text-align: justify">
+								Three designs were considered and undergone on selected constraints and engineering standards on the development of the curing
+								optimization algorithms of the system: Genetic Algorithm, Particle Swarm Optimization Algorithm, and the Differential Evolution
+								Algorithm. The best alternative determined by the design trade-offs was the Differential Evolution Algorithm. This design
+								significantly decreased laborious work, extensive curing time, and provided accurate data. The system's effectiveness is
+								demonstrated in field tests in accurately setting the parameters (temperature, nitrogen, phosphorus, potassium, pH level, and
+								moisture content) for achieving a favorable environment, automatedly, for the compost in the curing process. This project
+								stimulates advancement in optimizing compost curing by providing precise and authentic data results for a controlled environment
+								which promotes sustainable agricultural recycling practices.
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+	fetch("/plot")
+		.then((response) => response.json())
+		.then((data) => {
+			var layout = {
+				title: "Sensor Values",
+				xaxis: {
+					title: "Sensors",
+				},
+				yaxis: {
+					title: "Values",
+				},
+			};
+			Plotly.newPlot("sensorGraph", data, layout);
+		});
+
+	fetch("/latest_record")
+		.then((response) => response.json())
+		.then((data) => {
+			Plotly.newPlot("latestHistoryGraph", data.data, data.layout);
+		});
+
+	document.getElementById("exitButton").addEventListener("click", function () {
+		window.location.href = "/landing";
+	});
+</script>
+{% endblock %}

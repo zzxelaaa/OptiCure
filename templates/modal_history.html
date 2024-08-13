@@ -1,0 +1,66 @@
+<!-- templates/modal_history.html -->
+<div class="modal fade" id="historyModal" tabindex="-1" aria-labelledby="historyModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="historyModalLabel">History</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body" style="max-height: 500px; overflow-y: auto">
+				<table class="table table-bordered table-striped">
+					<thead>
+						<tr>
+							<th>Timestamp</th>
+							<th>Temperature</th>
+							<th>Moisture</th>
+							<th>Nitrogen</th>
+							<th>Phosphorus</th>
+							<th>Potassium</th>
+							<th>pH</th>
+							<th>Result</th>
+						</tr>
+					</thead>
+					<tbody id="historyTableBody">
+						<!-- Records will be appended here via JavaScript -->
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	// Function to convert timestamp to Date object
+	function parseTimestamp(timestamp) {
+		return new Date(timestamp);
+	}
+
+	// Fetch records and populate the table when the history modal is about to be shown
+	document.getElementById("historyModal").addEventListener("show.bs.modal", function () {
+		fetch("/history")
+			.then((response) => response.json())
+			.then((data) => {
+				// Sort data by timestamp in descending order
+				data.sort((a, b) => parseTimestamp(b.timestamp) - parseTimestamp(a.timestamp));
+
+				let tableBody = document.getElementById("historyTableBody");
+				tableBody.innerHTML = ""; // Clear existing table rows
+
+				data.forEach((record) => {
+					let row = document.createElement("tr");
+					row.innerHTML = `
+						<td>${record.timestamp}</td>
+						<td>${record.temp_val}</td>
+						<td>${record.moist_val}</td>
+						<td>${record.n_val}</td>
+						<td>${record.p_val}</td>
+						<td>${record.k_val}</td>
+						<td>${record.ph_val}</td>
+						<td>${record.classification_result}</td>
+					`;
+					tableBody.appendChild(row);
+				});
+			})
+			.catch((error) => console.error("Error fetching history:", error));
+	});
+</script>
